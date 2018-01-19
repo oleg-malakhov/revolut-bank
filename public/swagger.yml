@@ -1,0 +1,543 @@
+swagger: "2.0"
+info:
+  description: "This is a sample Bank application. "
+  version: "1.0.0"
+  title: "Revolute Test Task"
+  contact:
+    email: "oleg_dev@legatus.ru"
+
+host: "localhost:9000"
+
+basePath: "/"
+tags:
+- name: "client"
+  description: "Managing clients"
+- name: "account"
+  description: "Managing accounts"
+- name: "transfer"
+  description: "Transfer operations"
+
+schemes:
+- "http"
+
+paths:
+  /client/:
+    post:
+      tags:
+        - "client"
+      operationId: "addClient"
+      summary: "Add a new client"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Client object to add"
+          required: true
+          schema:
+            $ref: "#/definitions/Client"
+      responses:
+        200:
+          description: "Client has been created"
+          schema:
+            type: "object"
+            properties:
+              status:
+                type: integer
+              message:
+                type: string
+              body:
+                type: object
+                $ref: "#/definitions/Client"
+            example:
+              status: 200
+              message: "Client has been created"
+              body:
+                id: 1
+                passport: "238234"
+                name: "Jane"
+                surname: "Brown"
+        406:
+          description: "Invalid input"
+          schema:
+            type: object
+            $ref: "#/definitions/ErrorResponse"
+    get:
+      tags:
+        - "client"
+      operationId: "listClients"
+      summary: "Get all Clients"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              message:
+                type: string
+              body:
+                type: array
+                items:
+                  $ref: "#/definitions/Client"
+            example:
+              status: 200
+              message: "Client list"
+              body:
+                - id: 1
+                  passport: "238234"
+                  name: "Jane"
+                  surname: "Brown"
+                - id: 2
+                  passport: "32343"
+                  name: "Jake"
+                  surname: "Black"
+
+  /client/{clientId}:
+    get:
+      tags:
+        - "client"
+      operationId: "getClientById"
+      summary: "Get Client data by Id"
+      parameters:
+      - name: "clientId"
+        in: "path"
+        description: "ID of Client to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              message:
+                type: string
+              body:
+                $ref: "#/definitions/Client"
+            example:
+              status: 200
+              message: "Client has been found"
+              body:
+                id: 1
+                passport: 2343433
+                name: Jane
+                surename: Brown
+        404:
+          description: "Client has not been found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    put:
+      tags:
+      - "client"
+      operationId: "updateClient"
+      summary: "Update Client Data"
+      parameters:
+      - name: "clientId"
+        in: "path"
+        description: "ID of Client to update"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "body"
+        in: "body"
+        description: "Update Client data"
+        required: true
+        schema:
+          $ref: "#/definitions/Client"
+      responses:
+        200:
+          description: "Successful operation."
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              message:
+                type: string
+              body:
+                type: object
+                $ref: "#/definitions/Client"
+        404:
+          description: "The Client to update is not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /client/find:
+    get:
+      tags:
+        - "client"
+      operationId: "Find client"
+      summary: "Find client by his/her passport"
+      parameters:
+      - name: "passport"
+        description: "Client's passport number"
+        in: "query"
+        type: "string"
+        required: true
+        default: "12341234"
+      responses:
+        200:
+          description: "Successful operation."
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              message:
+                type: string
+              body:
+                type: object
+                $ref: "#/definitions/Client"
+        404:
+          description: "The Client to update is not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /account/:
+    post:
+      tags:
+        - "account"
+      operationId: "createAccountForClient"
+      summary:  "Create account for Client"
+      parameters:
+        - in: body
+          name: account data
+          schema:
+            type: "object"
+            properties:
+              clientId:
+                type: integer
+              accountName:
+                type: string
+            example:
+              clientId: 2
+              accountName: Main Account
+      responses:
+        200:
+          description: "Client has been created"
+          schema:
+            type: "object"
+            properties:
+              status:
+                type: integer
+              message:
+                type: string
+              body:
+                type: object
+                $ref: "#/definitions/Account"
+            example:
+              status: 200
+              message: "Account has been created"
+              body:
+                id: 3
+                clientId: 2
+                balance: 0.0
+        404:
+          description: "Client wasn't found"
+          schema:
+            type: object
+            $ref: "#/definitions/ErrorResponse"
+
+  /client/{clientId}/accounts:
+    get:
+      tags:
+        - "account"
+      operationId: "listAccountsForClient"
+      summary: "List accounts for the Client"
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: clientId
+          description: "Client ID"
+          required: true
+      responses:
+        200:
+          description: "Accounts received"
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              message:
+                type: string
+              body:
+                type: array
+                items:
+                  $ref: "#/definitions/Account"
+        404:
+          description: "Client not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /account/{accountId}:
+    get:
+      tags:
+        - "account"
+      operationId: "getAccount"
+      summary: "Account data"
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: accountId
+          type: integer
+          description: "Account ID"
+          required: true
+      responses:
+        200:
+          description: "Operation successful"
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              message:
+                type: string
+              body:
+                $ref: "#/definitions/Account"
+        404:
+          description: "Account not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /account/{accountId}/transfers:
+    get:
+      tags:
+        - "transfer"
+      operationId: "listTransfersForAccount"
+      summary: "List transfers for Account"
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: accountId
+          type: integer
+          description: "Account ID"
+          required: true
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              message:
+                type: strijg
+              body:
+                type: array
+                items:
+                  $ref: "#/definitions/Transfer"
+        404:
+          description: "Account not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /transfer/deposit:
+    post:
+      tags:
+        - "transfer"
+      operationId: "depositCash"
+      summary: "Deposit Cash"
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: Transfer Details
+          schema:
+            type: object
+            properties:
+              accountIdTo:
+                type: integer
+              money:
+                type: number
+                minimum: 0
+      responses:
+        200:
+          description: "Deposit successful"
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              message:
+                type: string
+              body:
+                $ref: "#/definitions/Account"
+        404:
+          description: "Account doesn't exist"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+
+
+  /transfer/withdraw:
+    post:
+      tags:
+        - "transfer"
+      operationId: "withdrawCash"
+      summary: "Withdraw Cash"
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: Transfer Details
+          schema:
+            type: object
+            properties:
+              accountIdFrom:
+                type: integer
+              money:
+                type: number
+                minimum: 0
+      responses:
+        200:
+          description: "Withdraw successful"
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              message:
+                type: string
+              body:
+                $ref: "#/definitions/Account"
+        404:
+          description: "Account doesn't exist"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        406:
+          description: "Not enough cash"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /transfer/between:
+    post:
+      tags:
+        - "transfer"
+      operationId: "transferBetweenAccounts"
+      summary: "Transfer between Accounts"
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: Transfer Details
+          schema:
+            type: object
+            properties:
+              accountIdFrom:
+                type: integer
+              accountIdTo:
+                type: integer
+              money:
+                type: number
+                minimum: 0
+      responses:
+        200:
+          description: "Transfer successful"
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              message:
+                type: string
+              body:
+                type: array
+                items:
+                  $ref: "#/definitions/Account"
+        404:
+          description: "Account doesn't exist"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        406:
+          description: "Not enough cash"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+definitions:
+  Client:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        readOnly: true
+      passport:
+        type: "string"
+      name:
+        type: "string"
+      surname:
+        type: "string"
+    example:
+      passport: "12341234"
+      name: Jack
+      surname: Daniels
+
+  Account:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        readOnly: true
+      clientId:
+        type: "integer"
+      balance:
+        type: "number"
+    example:
+      id: 3
+      clientId: 2
+      balance: 0.0
+
+  Transfer:
+    type: "object"
+    properties:
+      timestamp:
+        type: string
+      money:
+        type: number
+      message:
+        type: string
+
+  ApiResponse:
+    type: "object"
+    properties:
+      status:
+        type: "integer"
+        format: "int32"
+      message:
+        type: "string"
+      body:
+        type: "object"
+
+  ErrorResponse:
+    type: "object"
+    properties:
+      status:
+        type: "integer"
+        format: "int32"
+      message:
+        type: "string"
+      body:
+        type: "object"
+    example:
+      status: 404
+      message: "Error message"
+      body: null
+
+
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"

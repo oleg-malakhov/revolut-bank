@@ -1,0 +1,29 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+OPTIONS /                           ru.legatus.revolut.controllers.ApplicationController.rootOptions()
+OPTIONS /*url                       ru.legatus.revolut.controllers.ApplicationController.options(url: String)
+
+GET     /                           controllers.HomeController.index
+
+POST    /client/                    ru.legatus.revolut.controllers.ClientController.createClient()
+GET     /client/                    ru.legatus.revolut.controllers.ClientController.listClients()
+GET     /client/find                ru.legatus.revolut.controllers.ClientController.findClient(passport: String ?= "")
+PUT     /client/:id                 ru.legatus.revolut.controllers.ClientController.updateClient(id: Integer)
+GET     /client/:id                 ru.legatus.revolut.controllers.ClientController.getClient(id: Integer)
+GET     /client/:clientId/accounts  ru.legatus.revolut.controllers.AccountController.listForClient(clientId: Integer)
+
+POST    /account/                   ru.legatus.revolut.controllers.AccountController.createAccount()
+GET     /account/:id                ru.legatus.revolut.controllers.AccountController.getAccount(id: Integer)
+GET     /account/:id/transfers      ru.legatus.revolut.controllers.TransferController.transferList(id: Integer)
+
+POST    /transfer/deposit           ru.legatus.revolut.controllers.TransferController.deposit()
+POST    /transfer/withdraw          ru.legatus.revolut.controllers.TransferController.withdraw()
+POST    /transfer/between           ru.legatus.revolut.controllers.TransferController.transfer()
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+GET   /swagger-ui                   ru.legatus.revolut.controllers.ApplicationController.redirectDocs()
+GET   /swagger.yml                  controllers.Assets.at(path="/public/", file="swagger.yml")
